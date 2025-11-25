@@ -3,18 +3,26 @@ from .. import props
 from .. import utils
 
 
+_should_update_exclude_tabs = True
+
+
 def update_exclude_tabs(self=None, context=None):
+    global _should_update_exclude_tabs
+    if not _should_update_exclude_tabs:
+        return
+
     if not self:
         self = bpy.context.preferences.addons[utils.addon.module()].preferences
 
     exclude: str = self.exclude_tabs
     default: str = self.bl_rna.properties['exclude_tabs'].default
-
     exclude = [tab.strip() for tab in exclude.split(',')]
     default = [tab.strip() for tab in default.split(',')]
-
     combined = sorted(set(exclude + default))
-    self['exclude_tabs'] = ', '.join(tab for tab in combined if tab)
+
+    _should_update_exclude_tabs = False
+    self.exclude_tabs = ', '.join(tab for tab in combined if tab)
+    _should_update_exclude_tabs = True
 
 
 class AddonPrefs(bpy.types.AddonPreferences):

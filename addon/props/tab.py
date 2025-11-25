@@ -1,11 +1,19 @@
 import bpy
 
 
-def update_rename(self, context):
-    if not self.rename:
-        self['rename'] = self.name
+_should_update_rename = True
 
-    self['rename'] = self.rename.strip()
+
+def update_rename(self, context):
+    global _should_update_rename
+    if not _should_update_rename:
+        return
+
+    _should_update_rename = False
+    if not self.rename:
+        self.rename = self.name
+    self.rename = self.rename.strip()
+    _should_update_rename = True
 
 
 class TabProps(bpy.types.PropertyGroup):
